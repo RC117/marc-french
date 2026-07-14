@@ -376,7 +376,7 @@ You must respond ONLY with a valid JSON object matching this structure:
       const sysInstruction = "You are an expert French curriculum designer writing an adaptive serialized story. Output ONLY valid JSON.";
 
       // THIS IS NEW: Changed 2.5-flash to 1.5-flash to fix the 404 error
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -531,7 +531,7 @@ You must respond ONLY with a valid JSON object matching this structure:
       if (keys.gemini) {
         try {
           const prompt = `Translate and explain the French word "${text}" inside the context: "${context}". Base form, gender, short English meaning. 2 short sentences max.`;
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${keys.gemini}`, {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${keys.gemini}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -585,7 +585,7 @@ You must respond ONLY with a valid JSON object matching this structure:
       if (keys.gemini) {
         try {
           const prompt = `Explain translation and any key grammar rules for the French phrase: "${phrase}". Max 3 sentences.`;
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${keys.gemini}`, {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${keys.gemini}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
