@@ -537,7 +537,8 @@ You must respond ONLY with a valid JSON object matching this structure:
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
           const json = await response.json();
-          return json.candidates[0].content.parts[0].text;
+          let rawOutput = json.candidates[0].content.parts[0].text;
+          return parseMarkdownToHTML(rawOutput);
         } catch (e) {}
       }
       try {
@@ -591,10 +592,11 @@ You must respond ONLY with a valid JSON object matching this structure:
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
           const json = await response.json();
-          const explanation = json.candidates[0].content.parts[0].text;
-          defContent.innerHTML = `<strong>Phrase Analysis:</strong><br>${explanation}`;
-          state.definitionsCache[phrase.toLowerCase()] = explanation;
-          trackWordLookup(phrase.toLowerCase(), explanation, false);
+          const rawExplanation = json.candidates[0].content.parts[0].text;
+          const formattedExplanation = parseMarkdownToHTML(rawExplanation);
+          defContent.innerHTML = `<strong>Phrase Analysis:</strong><br><br>${formattedExplanation}`;
+          state.definitionsCache[phrase.toLowerCase()] = formattedExplanation;
+          trackWordLookup(phrase.toLowerCase(), formattedExplanation, false);
           saveStateToStorage();
           return;
         } catch(e) {}
@@ -602,10 +604,11 @@ You must respond ONLY with a valid JSON object matching this structure:
       try {
         const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(phrase)}&langpair=fr|en`);
         const json = await res.json();
-        const explanation = `<strong>Translation:</strong> "${json.responseData.translatedText}"`;
-        defContent.innerHTML = explanation;
-        state.definitionsCache[phrase.toLowerCase()] = explanation;
-        trackWordLookup(phrase.toLowerCase(), explanation, false);
+        const rawExplanation = json.candidates[0].content.parts[0].text;
+        const formattedExplanation = parseMarkdownToHTML(rawExplanation);
+        defContent.innerHTML = `<strong>Phrase Analysis:</strong><br><br>${formattedExplanation}`;
+        state.definitionsCache[phrase.toLowerCase()] = formattedExplanation;
+        trackWordLookup(phrase.toLowerCase(), formattedExplanation, false);
         saveStateToStorage();
       } catch (e) { defContent.innerHTML = `Erreur de connexion.`; }
     }
@@ -727,6 +730,17 @@ You must respond ONLY with a valid JSON object matching this structure:
 
     window.addEventListener('DOMContentLoaded', initApp);
 
+    function parseMarkdownToHTML(text) {
+      if (!text) return "";
+      return text
+        // Replace **bold** with <strong>bold</strong>
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Replace *italic* with <em>italic</em>
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Replace line breaks with HTML breaks
+        .replace(/\n/g, '<br>');
+    }
+    
     // --- PWA SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
       const swText = `
